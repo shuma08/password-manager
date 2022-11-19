@@ -1,0 +1,23 @@
+.App {
+  text-align: center;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%
+}
+
+.login-form {
+  width: 350px;
+
+  .login-form-button {
+    width: 100%
+  }
+
+  // a {
+  //   text-align: center;
+  // }
+}
