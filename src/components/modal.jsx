@@ -1,10 +1,11 @@
 import React from 'react'
 import { Modal as AntModal } from 'antd';
 
-const Modal = ({ title,children, onOk, onOpen, onCancel }) => {
+const Modal = ({ title,footer,children, onOk, onOpen, onCancel }) => {
     return (
         <AntModal
             title={title}
+            footer={footer}
             centered
             style={{
                 top: 20,

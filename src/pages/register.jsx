@@ -12,12 +12,6 @@ const Register = ({ database }) => {
   const onFinish = (values) => {
     createUserWithEmailAndPassword(auth, values.email, values.password)
       .then(res => {
-        // message.open({
-        //   type: 'loading',
-        //   content: 'Action in progress..',
-        //   duration: 0,
-        //   onClose
-        // });
         sessionStorage.setItem('userEmail', res.user.email);
         addDoc(collectionRef, {
           email: values.email,
@@ -45,8 +39,6 @@ const Register = ({ database }) => {
           content: e.message,
         });
       })
-
-    // console.log('Received values of form: ', values);
   };
   return (
     <>

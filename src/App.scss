@@ -14,6 +14,12 @@
 .card-container {
   width: 50%;
 
+  .btn-container {
+    display: flex;
+    justify-content: end;
+    margin-bottom: 20px;
+  }
+
   .info-container {
     width: 100%;
     display: flex;
