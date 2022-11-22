@@ -14,8 +14,7 @@ const Login = () => {
           type: 'success',
           content: 'Login success',
         });
-        console.log(res);
-        sessionStorage.setItem("userEmail",res.user.email)
+        localStorage.setItem("userEmail",res.user.email)
         nav("/dashboard")
       })
       .catch(e => {
@@ -26,7 +25,6 @@ const Login = () => {
       })
   };
   return (
-    <>
       <div className='container'>
         <h2>Login</h2>
         <Form
@@ -79,8 +77,6 @@ const Login = () => {
           </Form.Item>
         </Form>
       </div>
-
-    </>
   );
 }
 

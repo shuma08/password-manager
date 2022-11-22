@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 const Dashboard = ({ database }) => {
-  const userEmail = sessionStorage.getItem('userEmail')
+  const userEmail = localStorage.getItem('userEmail')
   const nav = useNavigate();
   const auth = getAuth();
   const collectionRef = collection(database, 'userPasswords');
@@ -20,6 +20,13 @@ const Dashboard = ({ database }) => {
   const [onEdit, setOnEdit] = useState(false);
   const [openModal, setOpenModal] = useState(false)
 
+  const getPasswords = () => {
+    onSnapshot(emailQuery, (res) => {
+      setId(res.docs.map((item) => item.id))
+      setPasswordArray(res.docs.map((item) => item.data()));
+    })
+  }
+
   useEffect(() => {
     onAuthStateChanged(auth, res => {
       if (res) {
@@ -29,29 +36,19 @@ const Dashboard = ({ database }) => {
       }
     })
   }, [])
-  const getPasswords = () => {
-    onSnapshot(emailQuery, (res) => {
-      setId(res.docs.map((item) => {
-        return item.id
-      }))
-      setPasswordArray(res.docs.map((item) => {
-        return item.data()
-      }));
 
-    })
-  }
+
   const onCloseModal = () => {
     setOpenModal(prev => !prev)
     setInfoValues({})
     setShow(false)
   }
 
-  const deleteInfo = (info) => {
+  const deleteInfo = async (info) => {
     const docToDelete = doc(database, "userPasswords", id && id[0])
-    updateDoc(docToDelete, {
-      accountsInfo: [...passwordArray[0]?.accountsInfo.filter((item => item !== info))]
+    await updateDoc(docToDelete, {
+      accountsInfo: passwordArray[0]?.accountsInfo.filter((item => item !== info))
     })
-    setOpenModal(false)
   }
 
   const showPassword = (info) => {
@@ -63,7 +60,7 @@ const Dashboard = ({ database }) => {
     signOut(auth)
       .then(() => {
         nav("/login")
-        sessionStorage.removeItem('userEmail')
+        localStorage.removeItem('userEmail')
       })
   }
   const handleOpen = (info) => {
@@ -75,7 +72,7 @@ const Dashboard = ({ database }) => {
     if (onEdit) {
       const docToUpdate = doc(database, "userPasswords", id && id[0])
       updateDoc(docToUpdate, {
-        accountsInfo: [...passwordArray[0]?.accountsInfo.map((p) => p.id == infoValues.id ? { ...p, name: infoValues.name, password: infoValues.password } : p)]
+        accountsInfo: passwordArray[0]?.accountsInfo.map((p) => p.id == infoValues.id ? { ...p, name: infoValues.name, password: infoValues.password } : p)
       })
       setOnEdit(false)
       setOpenModal(false)
@@ -89,34 +86,31 @@ const Dashboard = ({ database }) => {
       setInfoValues({})
     }
   }
-  
+
   return (
     <div className='container card'>
       <div className='card-container'>
         <div className='btn-container'>
-          <Button  onClick={() => setOpenModal(prev => !prev)}>Add password</Button>
-          <Button type="primary" onClick={() => logOut()} style={{marginLeft:20}}>Log out</Button>
+          <Button onClick={() => setOpenModal(prev => !prev)}>Add password</Button>
+          <Button type="primary" onClick={() => logOut()} style={{ marginLeft: 20 }}>Log out</Button>
         </div>
 
         <Card title="Create password for your businesses">
-          {passwordArray?.map((item) => {
-            return (
-              <div key={item.name}>
-                {item?.accountsInfo?.map((info) => {
-                  return (
-                    <div className='info-container' key={info.id}>
-                      <p>{info.name}</p>
-                      <div className='icons-container'>
-                        <EyeOutlined className='icon-eye' onClick={() => showPassword(info)} />
-                        <EditOutlined className='icon-edit' onClick={() => handleOpen(info)} />
-                        <DeleteOutlined className='icon-delete' onClick={() => deleteInfo(info)} />
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )
-          })
+          {passwordArray?.map((item) => (
+            <div key={item.name}>
+              {item?.accountsInfo?.map((info) => (
+                <div className='info-container' key={info.id}>
+                  <p>{info.name}</p>
+                  <div className='icons-container'>
+                    <EyeOutlined className='icon-eye' onClick={() => showPassword(info)} />
+                    <EditOutlined className='icon-edit' onClick={() => handleOpen(info)} />
+                    <DeleteOutlined className='icon-delete' onClick={() => deleteInfo(info)} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
+          )
           }
         </Card>
         {openModal && (
@@ -129,7 +123,7 @@ const Dashboard = ({ database }) => {
               <Button key="cancel" onClick={onCloseModal}>
                 Cancle
               </Button>,
-              <Button key="submit" type="primary" disabled={show} onClick={onSubmitForm}>
+              <Button key="submit" type="primary" disabled={show || (!infoValues.name || !infoValues.password)} onClick={onSubmitForm}>
                 Submit
               </Button>,
             ]}

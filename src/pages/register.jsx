@@ -12,7 +12,7 @@ const Register = ({ database }) => {
   const onFinish = (values) => {
     createUserWithEmailAndPassword(auth, values.email, values.password)
       .then(res => {
-        sessionStorage.setItem('userEmail', res.user.email);
+        localStorage.setItem('userEmail', res.user.email);
         addDoc(collectionRef, {
           email: values.email,
           password: values.password,
