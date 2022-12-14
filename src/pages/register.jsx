@@ -9,37 +9,29 @@ const Register = ({ database }) => {
   const nav = useNavigate()
   const collectionRef = collection(database, 'userPasswords')
   const auth = getAuth();
-  const onFinish = (values) => {
-    createUserWithEmailAndPassword(auth, values.email, values.password)
-      .then(res => {
-        localStorage.setItem('userEmail', res.user.email);
-        addDoc(collectionRef, {
-          email: values.email,
-          password: values.password,
-          accountsInfo: []
-        })
-          .then(() => {
-            
-            message.open({
-              type: 'success',
-              content: 'Account registered',
-            });
-            nav('/login')
-          })
-          .catch(e => {
-            message.open({
-              type: 'error',
-              content: e.message,
-            });
-          })
+  const onFinish = async (values) => {
+    try {
+      const res = await createUserWithEmailAndPassword(auth, values.email, values.password)
+      localStorage.setItem('userEmail', res.user.email);
+      addDoc(collectionRef, {
+        email: values.email,
+        password: values.password,
+        accountsInfo: []
       })
-      .catch(e => {
-        message.open({
-          type: 'error',
-          content: e.message,
-        });
-      })
-  };
+      message.open({
+        type: 'success',
+        content: 'Account registered',
+      });
+      nav('/login')
+    }
+    catch (e) {
+      message.open({
+        type: 'error',
+        content: e.message,
+      });
+    }
+  }
+
   return (
     <>
       <div className='container'>

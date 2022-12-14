@@ -22,10 +22,11 @@ const Dashboard = ({ database }) => {
 
   const getPasswords = () => {
     onSnapshot(emailQuery, (res) => {
-      setId(res.docs.map((item) => item.id))
-      setPasswordArray(res.docs.map((item) => item.data()));
+      setId(res.docs[0].id)
+      setPasswordArray(res.docs[0].data().accountsInfo);
     })
   }
+  // console.log(passwordArray);
 
   useEffect(() => {
     onAuthStateChanged(auth, res => {
@@ -45,9 +46,9 @@ const Dashboard = ({ database }) => {
   }
 
   const deleteInfo = async (info) => {
-    const docToDelete = doc(database, "userPasswords", id && id[0])
+    const docToDelete = doc(database, "userPasswords", id )
     await updateDoc(docToDelete, {
-      accountsInfo: passwordArray[0]?.accountsInfo.filter((item => item !== info))
+      accountsInfo: passwordArray?.filter((item => item !== info))
     })
   }
 
@@ -70,22 +71,23 @@ const Dashboard = ({ database }) => {
   }
   const onSubmitForm = () => {
     if (onEdit) {
-      const docToUpdate = doc(database, "userPasswords", id && id[0])
+      const docToUpdate = doc(database, "userPasswords", id )
       updateDoc(docToUpdate, {
-        accountsInfo: passwordArray[0]?.accountsInfo.map((p) => p.id == infoValues.id ? { ...p, name: infoValues.name, password: infoValues.password } : p)
+        accountsInfo: passwordArray?.map((p) => p.id == infoValues.id ? { ...p, name: infoValues.name, password: infoValues.password } : p)
       })
       setOnEdit(false)
       setOpenModal(false)
       setInfoValues({})
     } else {
-      const docToUpdate = doc(database, "userPasswords", id && id[0])
+      const docToUpdate = doc(database, "userPasswords", id )
       updateDoc(docToUpdate, {
-        accountsInfo: [...passwordArray[0]?.accountsInfo, infoValues]
+        accountsInfo: [...passwordArray, infoValues]
       })
       setOpenModal(false)
       setInfoValues({})
     }
   }
+
 
   return (
     <div className='container card'>
@@ -96,9 +98,8 @@ const Dashboard = ({ database }) => {
         </div>
 
         <Card title="Create password for your businesses">
-          {passwordArray?.map((item) => (
-            <div key={item.name}>
-              {item?.accountsInfo?.map((info) => (
+          {passwordArray?.map((info) => (
+            <div key={info.name}>
                 <div className='info-container' key={info.id}>
                   <p>{info.name}</p>
                   <div className='icons-container'>
@@ -107,7 +108,6 @@ const Dashboard = ({ database }) => {
                     <DeleteOutlined className='icon-delete' onClick={() => deleteInfo(info)} />
                   </div>
                 </div>
-              ))}
             </div>
           )
           )

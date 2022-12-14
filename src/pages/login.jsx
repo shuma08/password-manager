@@ -7,23 +7,24 @@ import { signInWithEmailAndPassword, getAuth } from 'firebase/auth';
 const Login = () => {
   const auth = getAuth();
   const nav = useNavigate()
-  const onFinish = (values) => {
-    signInWithEmailAndPassword(auth, values.email, values.password)
-      .then((res) => {
-        message.open({
-          type: 'success',
-          content: 'Login success',
-        });
-        localStorage.setItem("userEmail",res.user.email)
-        nav("/dashboard")
-      })
-      .catch(e => {
-        message.open({
-          type: 'error',
-          content: e.message,
-        });
-      })
+  const onFinish = async (values) => {
+    try {
+      const res = await signInWithEmailAndPassword(auth, values.email, values.password)
+      message.open({
+        type: 'success',
+        content: 'Login success',
+      });
+      localStorage.setItem("userEmail",res.user.email)
+      nav("/dashboard")
+    } catch (e) {
+      message.open({
+        type: 'error',
+        content: e.message.split("/").slice(1),
+        // content: e.message,
+      });
+    }
   };
+
   return (
       <div className='container'>
         <h2>Login</h2>
